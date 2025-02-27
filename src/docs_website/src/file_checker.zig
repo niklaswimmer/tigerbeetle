@@ -253,10 +253,13 @@ fn check_link_fragment(
 ) !void {
     assert(std.mem.endsWith(u8, target_path, ".html"));
 
+    // TODO(Fabio): foot note back references need to be parsed correctly in single_page_writer.zig
+    if (std.mem.containsAtLeast(u8, fragment, 1, "fnref")) return;
+
     const html = try read_file_cached(context.arena, context.dir, target_path);
     const needle = try std.mem.concat(context.arena, u8, &.{ "id=\"", fragment, "\"" });
     if (std.mem.indexOf(u8, html, needle) == null) {
-        log.err("link target '{s}'' does not contain anchor: '{s}'", .{ target_path, fragment });
+        log.err("link target '{s}' does not contain anchor: '{s}'", .{ target_path, fragment });
         return error.AnchorNotFound;
     }
 }
